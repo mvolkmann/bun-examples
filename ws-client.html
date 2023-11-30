@@ -1,0 +1,32 @@
+<html lang="en">
+  <head>
+    <script>
+      let input, message, output;
+      window.onload = () => {
+        message = document.getElementById('message');
+        input = document.getElementById('input');
+        output = document.getElementById('output');
+      };
+
+      const ws = new WebSocket('ws://localhost:1919');
+      ws.addEventListener('open', event => {
+        send('opened connection');
+      });
+      ws.addEventListener('message', event => {
+        output.innerHTML = event.data;
+      });
+
+      function send(text) {
+        input.innerHTML = text;
+        ws.send(text);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>WebSocket Client</h1>
+    <input id="message" />
+    <button onclick="send(message.value)">Send</button>
+    <div>Input: <span id="input" /></div>
+    <div>Output: <span id="output" /></div>
+  </body>
+</html>
