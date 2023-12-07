@@ -1,8 +1,5 @@
 const thisURL = import.meta.url;
-const prefix = 'file://';
-// openInEditor only works if the prefix is removed.
-const path = thisURL.substring(prefix.length);
-// const path = '/Users/volkmannm/Documents/dev/bun/bun-examples/.prettierrc';
+const path = Bun.fileURLToPath(new URL(thisURL));
 console.log('open-in-editor.ts: path =', path);
 
 Bun.openInEditor(path, {editor: 'vscode'});

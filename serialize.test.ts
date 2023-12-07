@@ -8,5 +8,5 @@ test('serialize', async () => {
   ];
   const buffer = serialize(dogs);
   const newDogs = deserialize(buffer);
-  expect(Bun.deepEquals(dogs, newDogs)).toBe(true);
+  expect(newDogs).toStrictEqual(dogs);
 });
