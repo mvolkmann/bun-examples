@@ -2,6 +2,9 @@
   "name": "beth",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "dev": "bun run --watch index.tsx"
+  },
   "devDependencies": {
     "bun-types": "latest",
     "typed-html": "^3.0.1"

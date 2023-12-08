@@ -1,4 +1,15 @@
-# BETH Steps
+# BETH Stack
+
+## Overview
+
+The BETH stack uses:
+
+- Bun
+- ElysiaJS
+- typed-html
+- HTMX
+
+## Steps
 
 - See the YouTube video at https://www.youtube.com/watch?v=cpzowDDJj24.
 - create directory and cd to it
@@ -6,9 +17,10 @@
 - enter "bun add elysia"
 - enter "bun add @elysiajs/html"
 - enter "bun add -d typed-html"
-- add the following line in "tsconfig.json"
+- modify "tsconfig.json" to contain the following lines
 
   ```json
+    "jsx": "react",
     "jsxFactory": "elements.createElement",
   ```
 
@@ -30,3 +42,4 @@
 - browse localhost:1919
 
 - rename "index.ts" to "index.tsx"
+- for VS Code users, install the "htmx-tags" extension
