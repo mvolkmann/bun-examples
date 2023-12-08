@@ -12,11 +12,44 @@ const BaseHtml = ({children}: elements.Children) => `
     <script src="https://unpkg.com/htmx.org@1.9.9"></script>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
+  <body class="p-8">
     ${children}
   </body>
 </html>
 `;
+
+type Todo = {
+  id: number;
+  description: string;
+  completed: boolean;
+};
+
+const todos: Todo[] = [
+  {id: 1, description: 'Buy milk', completed: true},
+  {id: 2, description: 'Cut grass', completed: false}
+];
+
+type TodoItemProps = {todo: Todo};
+function TodoItem({todo}: TodoItemProps) {
+  return (
+    <div class="flex gap-4">
+      <input type="checkbox" checked={todo.completed} />
+      <p>{todo.description}</p>
+      <button class="text-red-500">X</button>
+    </div>
+  );
+}
+
+type TodoListProps = {todos: Todo[]};
+function TodoList({todos}: TodoListProps) {
+  return (
+    <div>
+      {todos.map(todo => (
+        <TodoItem todo={todo} />
+      ))}
+    </div>
+  );
+}
 
 const app = new Elysia();
 app.use(html());
@@ -38,6 +71,12 @@ app.get('/', ({html}) =>
     </BaseHtml>
   )
 );
+
+app.get('/todos', () => (
+  <BaseHtml>
+    <TodoList todos={todos} />
+  </BaseHtml>
+));
 
 app.post('/clicked', () => <div>This is from the server.</div>);
 
