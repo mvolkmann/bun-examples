@@ -1,6 +1,9 @@
-import {Elysia} from 'elysia';
+import {Elysia, t} from 'elysia';
 import {html} from '@elysiajs/html';
 import * as elements from 'typed-html';
+
+const app = new Elysia();
+app.use(html());
 
 const BaseHtml = ({children}: elements.Children) => `
 <!DOCTYPE html>
@@ -35,7 +38,7 @@ function TodoItem({todo}: TodoItemProps) {
     <div class="flex gap-4">
       <input type="checkbox" checked={todo.completed} />
       <p>{todo.description}</p>
-      <button class="text-red-500">X</button>
+      <button>🗑</button>
     </div>
   );
 }
@@ -51,12 +54,9 @@ function TodoList({todos}: TodoListProps) {
   );
 }
 
-const app = new Elysia();
-app.use(html());
-
 // app.get('/', () => 'Hello, Elysia!');
 
-app.get('/', ({html}) =>
+app.get('/', () =>
   html(
     <BaseHtml>
       <div class="bg-gray-200 flex w-full h-screen justify-center items-center">
@@ -79,6 +79,19 @@ app.get('/todos', () => (
 ));
 
 app.post('/clicked', () => <div>This is from the server.</div>);
+
+/*
+app.post('/todos/toggle/:id', ({ params }) => {
+  const todo = todos.find(todo => todo.id === params.id);
+  if (todo) {
+    todo.completed = !todo.completed;
+    return <TodoItem todo={todo} />;
+  }
+}, {
+  params: t.Object({
+    id: t.Numeric(), // converts string param to a number
+  });
+ */
 
 app.listen(1919);
 
