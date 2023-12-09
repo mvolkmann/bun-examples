@@ -12,10 +12,17 @@ type Todo = {
   completed: boolean;
 };
 
-const todos: Todo[] = [
-  {id: 1, description: 'Buy milk', completed: true},
-  {id: 2, description: 'Cut grass', completed: false}
-];
+let nextId = 0;
+const todos: Todo[] = [];
+
+function addTodo(description: string) {
+  const todo = {id: nextId++, description, completed: false};
+  todos.push(todo);
+  return todo;
+}
+
+addTodo('buy milk');
+addTodo('cut grass');
 
 //-----------------------------------------------------------------------------
 
@@ -28,11 +35,33 @@ const BaseHtml = ({children}: Attributes) => (
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>BETH stack demo</title>
       <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+      <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
       <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="p-8">{children}</body>
   </html>
 );
+
+//-----------------------------------------------------------------------------
+
+function TodoForm() {
+  return (
+    <form
+      class="flex gap-4 my-4"
+      hx-post="/todos"
+      hx-swap="afterend"
+      _="on submit target.reset()"
+    >
+      <input
+        class="border border-gray-500 p-1 rounded-lg"
+        name="description"
+        placeholder="enter new todo here"
+        size="30"
+      />
+      <button type="submit">Add</button>
+    </form>
+  );
+}
 
 //-----------------------------------------------------------------------------
 
@@ -47,10 +76,11 @@ function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
         hx-target="closest div" // can also use a CSS selector
         hx-swap="outerHTML"
       />
-      <p>{description}</p>
+      <p class={completed ? 'text-gray-500 line-through' : ''}>{description}</p>
       <button
         hx-delete={`/todos/${id}`}
         hx-swap="outerHTML"
+        class="flex gap-4"
         hx-target="closest div"
       >
         🗑
@@ -110,9 +140,30 @@ app.get('/', () => (
 
 app.get('/todos', () => (
   <BaseHtml>
+    <h2>To Do List</h2>
+    <TodoForm />
     <TodoList todos={todos} />
   </BaseHtml>
 ));
+
+//-----------------------------------------------------------------------------
+
+app.post(
+  '/todos',
+  ({body}) => {
+    const {description} = body;
+    if (description.length === 0) {
+      throw new Error('Todo description cannot be empty');
+    }
+    const todo = addTodo(description);
+    return <TodoItem todo={todo} />;
+  },
+  {
+    body: t.Object({
+      description: t.String()
+    })
+  }
+);
 
 //-----------------------------------------------------------------------------
 
