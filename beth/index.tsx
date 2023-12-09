@@ -50,7 +50,7 @@ function TodoForm() {
       class="flex gap-4 my-4"
       hx-post="/todos"
       hx-swap="afterend"
-      _="on submit target.reset()"
+      _="on submit target.reset()" // uses hyperscript
     >
       <input
         class="border border-gray-500 p-1 rounded-lg"
@@ -104,6 +104,16 @@ function TodoList({todos}: TodoListProps) {
 
 //-----------------------------------------------------------------------------
 
+function TodoStatus() {
+  const uncompletedCount = todos.filter(todo => !todo.completed).length;
+  return (
+    <p>
+      {uncompletedCount} of {todos.length} remaining
+    </p>
+  );
+}
+//-----------------------------------------------------------------------------
+
 app.delete(
   '/todos/:id',
   ({params}) => {
@@ -141,6 +151,7 @@ app.get('/', () => (
 app.get('/todos', () => (
   <BaseHtml>
     <h2>To Do List</h2>
+    <TodoStatus />
     <TodoForm />
     <TodoList todos={todos} />
   </BaseHtml>
