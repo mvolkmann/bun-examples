@@ -16,7 +16,9 @@ The BETH stack uses:
 - enter "bun init"
 - enter "bun add elysia"
 - enter "bun add @elysiajs/html"
-- enter "bun add -d typed-html"
+- enter "bun add @elysiajs/static"
+- enter "bun add @kitajs/ts-html-plugin // detects XSS vulnerabilities
+- enter "bun add -d typed-html" // TODO: Need this?
 - modify "tsconfig.json" to contain the following lines
 
   ```json
@@ -43,3 +45,13 @@ The BETH stack uses:
 
 - rename "index.ts" to "index.tsx"
 - for VS Code users, install the "htmx-tags" extension
+
+## Database Setup
+
+- Create the database with `sqlite3 todos.db`
+- Create a table with `create table todos(id string primary key, description string, completed numeric);`
+- Verify that the table was created with `.schema`
+- Insert two rows with `insert into todos values('t1', 'cut grass', 0);`
+  and `insert into todos values('t2', 'buy milk', 1);`
+- Verify that the rows were inserted with `select * from todos;`
+- Exit with `.exit`

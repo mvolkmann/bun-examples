@@ -1,32 +1,54 @@
+import {Database} from 'bun:sqlite';
 import {Elysia, t} from 'elysia';
 import {html} from '@elysiajs/html';
+import {staticPlugin} from '@elysiajs/static';
 import * as elements from 'typed-html';
 import {Attributes} from 'typed-html';
 
 const app = new Elysia();
 app.use(html());
+app.use(staticPlugin());
+
+const db = new Database('todos.db', {create: true});
+const deleteTodoPS = db.prepare('delete from todos where id = ?');
+const getTodosQuery = db.query('select * from todos;');
+const insertTodoPS = db.prepare(
+  'insert into todos (description, completed) values (?, ?)'
+);
+const updateTodoPS = db.prepare('update todos set completed=? where id = ?');
 
 type Todo = {
-  id: number;
+  id: string;
   description: string;
-  completed: boolean;
+  completed: number; // 0 or 1 for SQLite compatibility
 };
 
+// This is the state.
 let nextId = 0;
 const todos: Todo[] = [];
 
 function addTodo(description: string) {
-  const todo = {id: nextId++, description, completed: false};
-  todos.push(todo);
-  return todo;
+  //const todo = {id: nextId++, description, completed: false};
+  // todos.push(todo);
+  // return todo;
+  try {
+    const result = insertTodoPS.run(description, 0);
+    console.log('index.tsx post: result =', result);
+    const id = result.lastInsertRowid as number;
+    console.log('index.tsx post: inserted row with id', id);
+    return {id, description, completed: 0};
+  } catch (e) {
+    console.error('index.tsx post: e =', e);
+    const isDuplicate = e.toString().includes('UNIQUE constraint failed');
+    throw isDuplicate ? new Error('duplicate todo ' + description) : e;
+  }
 }
 
-addTodo('buy milk');
-addTodo('cut grass');
+// addTodo('buy milk');
+// addTodo('cut grass');
 
 //-----------------------------------------------------------------------------
 
-// <!DOCTYPE html>
 // const BaseHtml = ({children}: elements.Children) => (
 const BaseHtml = ({children}: Attributes) => (
   <html lang="en">
@@ -34,9 +56,14 @@ const BaseHtml = ({children}: Attributes) => (
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>BETH stack demo</title>
-      <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+      {/* TODO: Can the staticPlugin default to looking in /public? */}
+      <link rel="stylesheet" href="/public/global.css" />
+      {/* <script src="https://unpkg.com/htmx.org@1.9.9"></script>
       <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
-      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://cdn.tailwindcss.com"></script> */}
+      <script src="public/htmx.min.js"></script>
+      <script src="public/hyperscript.min.js"></script>
+      <script src="public/tailwind.min.js"></script>
     </head>
     <body class="p-8">{children}</body>
   </html>
@@ -67,11 +94,12 @@ function TodoForm() {
 
 type TodoItemProps = {todo: Todo};
 function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
+  console.log('index.tsx TodoItem: id =', id);
   return (
     <div class="flex gap-4">
       <input
         type="checkbox"
-        checked={completed}
+        checked={completed === 1}
         hx-post={`/todos/toggle/${id}`}
         hx-target="closest div" // can also use a CSS selector
         hx-swap="outerHTML"
@@ -107,21 +135,32 @@ function TodoList({todos}: TodoListProps) {
 function TodoStatus() {
   const uncompletedCount = todos.filter(todo => !todo.completed).length;
   return (
-    <p>
+    <p id="todo-status" hx-swap-oob="true">
       {uncompletedCount} of {todos.length} remaining
     </p>
   );
 }
 //-----------------------------------------------------------------------------
 
+// This deletes a given todo.  It is the D in CRUD.
 app.delete(
   '/todos/:id',
   ({params}) => {
-    const todo = todos.find(todo => todo.id === params.id);
-    if (todo) {
-      todos.splice(todos.indexOf(todo), 1);
+    // const todo = todos.find(todo => todo.id === params.id);
+    // if (todo) {
+    //   todos.splice(todos.indexOf(todo), 1);
+    // }
+
+    try {
+      const result = deleteTodoPS.run(params.id);
+      console.log('index.tsx delete: result =', result);
+    } catch (e) {
+      console.error('index.tsx delete: e =', e);
+      throw e;
     }
-    // By not returning any HTML, we replace the existing todo item with nothing.
+    // By not returning any HTML for this todo item,
+    // we replace the existing todo item with nothing.
+    return <TodoStatus />;
   },
   {
     params: t.Object({
@@ -132,6 +171,7 @@ app.delete(
 
 //-----------------------------------------------------------------------------
 
+// This is a basic HTMX demo.
 app.get('/', () => (
   <BaseHtml>
     <div class="bg-gray-200 flex w-full h-screen justify-center items-center">
@@ -148,26 +188,36 @@ app.get('/', () => (
 
 //-----------------------------------------------------------------------------
 
-app.get('/todos', () => (
-  <BaseHtml>
-    <h2>To Do List</h2>
-    <TodoStatus />
-    <TodoForm />
-    <TodoList todos={todos} />
-  </BaseHtml>
-));
+// This renders the todo list UI.  It is the R in CRUD.
+app.get('/todos', () => {
+  const todos = getTodosQuery.all(); // get();
+  console.log('index.tsx get: todos =', todos);
+
+  return (
+    <BaseHtml>
+      <h2>To Do List</h2>
+      <TodoStatus />
+      <TodoForm />
+      <TodoList todos={todos} />
+    </BaseHtml>
+  );
+});
 
 //-----------------------------------------------------------------------------
 
+// This adds a new todo.  It is the C in CRUD.
 app.post(
   '/todos',
-  ({body}) => {
+  ({body}: any) => {
     const {description} = body;
     if (description.length === 0) {
       throw new Error('Todo description cannot be empty');
     }
     const todo = addTodo(description);
-    return <TodoItem todo={todo} />;
+    return (
+      // <TodoItem todo={todo} />
+      <TodoStatus />
+    );
   },
   {
     body: t.Object({
@@ -178,13 +228,23 @@ app.post(
 
 //-----------------------------------------------------------------------------
 
+// This toggles the completed state of a given todo.  It is the U in CRUD.
 app.post(
   '/todos/toggle/:id',
   ({params}) => {
+    console.log('index.tsx toggle: params =', params);
     const todo = todos.find(todo => todo.id === params.id);
+    console.log('index.tsx toggle: todo =', todo);
     if (todo) {
-      todo.completed = !todo.completed;
-      return <TodoItem todo={todo} />;
+      // todo.completed = !todo.completed;
+      // return <TodoItem todo={todo} />;
+      try {
+        const result = updateTodoPS.run(todo.completed ? 0 : 1, todo.id);
+        console.log('index.tsx post: result =', result);
+      } catch (e) {
+        console.error('index.tsx toggle: e =', e);
+        throw e;
+      }
     }
   },
   {
