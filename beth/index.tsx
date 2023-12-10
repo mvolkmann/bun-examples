@@ -52,6 +52,7 @@ const BaseHtml = ({children}: Attributes) => (
       <link rel="stylesheet" href="/public/global.css" />
       {/* <script src="https://unpkg.com/htmx.org@1.9.9"></script>
       <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+      // Tailwind removes the default styling of many HTML elements.
       <script src="https://cdn.tailwindcss.com"></script> */}
       <script src="public/htmx.min.js"></script>
       <script src="public/hyperscript.min.js"></script>
@@ -91,7 +92,7 @@ function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
       <input
         type="checkbox"
         checked={completed === 1}
-        hx-post={`/todos/toggle/${id}`}
+        hx-post={`/todos/${id}/toggle`}
         hx-target="closest div" // can also use a CSS selector
         hx-swap="outerHTML"
       />
@@ -137,6 +138,8 @@ app.delete(
   '/todos/:id',
   ({params}) => {
     try {
+      // TODO: How can you determine if this found a todo to delete and
+      // TODO: return this if it didn't? new Response('Not found', {status: 404});
       deleteTodoPS.run(params.id);
     } catch (e) {
       console.error('index.tsx delete: e =', e);
@@ -209,9 +212,8 @@ app.post(
 
 // This toggles the completed state of a given todo.  It is the U in CRUD.
 app.post(
-  '/todos/toggle/:id',
+  '/todos/:id/toggle',
   ({params}) => {
-    console.log('index.tsx toggle: params =', params);
     const todo = getTodoQuery.get(params.id) as Todo;
     if (todo) {
       try {
@@ -221,8 +223,10 @@ app.post(
         console.error('index.tsx toggle: e =', e);
         throw e;
       }
+      return <TodoItem todo={todo} />;
+    } else {
+      return new Response('Not found', {status: 404});
     }
-    return <TodoItem todo={todo} />;
   },
   {
     params: t.Object({
