@@ -2,7 +2,7 @@ import {Database} from 'bun:sqlite';
 import {Elysia, t} from 'elysia';
 import {html} from '@elysiajs/html';
 import {staticPlugin} from '@elysiajs/static';
-import * as elements from 'typed-html';
+// import * as elements from 'typed-html';
 import {Attributes} from 'typed-html';
 
 const app = new Elysia();
@@ -11,9 +11,10 @@ app.use(staticPlugin());
 
 const db = new Database('todos.db', {create: true});
 const deleteTodoPS = db.prepare('delete from todos where id = ?');
-const getTodosQuery = db.query('select * from todos;');
-const insertTodoPS = db.prepare(
-  'insert into todos (description, completed) values (?, ?)'
+const getAllTodosQuery = db.query('select * from todos;');
+const getTodoQuery = db.query('select * from todos where id = ?');
+const insertTodoQuery = db.query(
+  'insert into todos (description, completed) values (?, 0) returning id'
 );
 const updateTodoPS = db.prepare('update todos set completed=? where id = ?');
 
@@ -28,14 +29,8 @@ let nextId = 0;
 const todos: Todo[] = [];
 
 function addTodo(description: string) {
-  //const todo = {id: nextId++, description, completed: false};
-  // todos.push(todo);
-  // return todo;
   try {
-    const result = insertTodoPS.run(description, 0);
-    console.log('index.tsx post: result =', result);
-    const id = result.lastInsertRowid as number;
-    console.log('index.tsx post: inserted row with id', id);
+    const {id} = insertTodoQuery.get(description) as {id: number};
     return {id, description, completed: 0};
   } catch (e) {
     console.error('index.tsx post: e =', e);
@@ -43,9 +38,6 @@ function addTodo(description: string) {
     throw isDuplicate ? new Error('duplicate todo ' + description) : e;
   }
 }
-
-// addTodo('buy milk');
-// addTodo('cut grass');
 
 //-----------------------------------------------------------------------------
 
@@ -94,7 +86,6 @@ function TodoForm() {
 
 type TodoItemProps = {todo: Todo};
 function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
-  console.log('index.tsx TodoItem: id =', id);
   return (
     <div class="flex gap-4">
       <input
@@ -146,14 +137,8 @@ function TodoStatus() {
 app.delete(
   '/todos/:id',
   ({params}) => {
-    // const todo = todos.find(todo => todo.id === params.id);
-    // if (todo) {
-    //   todos.splice(todos.indexOf(todo), 1);
-    // }
-
     try {
-      const result = deleteTodoPS.run(params.id);
-      console.log('index.tsx delete: result =', result);
+      deleteTodoPS.run(params.id);
     } catch (e) {
       console.error('index.tsx delete: e =', e);
       throw e;
@@ -190,8 +175,7 @@ app.get('/', () => (
 
 // This renders the todo list UI.  It is the R in CRUD.
 app.get('/todos', () => {
-  const todos = getTodosQuery.all(); // get();
-  console.log('index.tsx get: todos =', todos);
+  const todos = getAllTodosQuery.all();
 
   return (
     <BaseHtml>
@@ -215,8 +199,8 @@ app.post(
     }
     const todo = addTodo(description);
     return (
-      // <TodoItem todo={todo} />
-      <TodoStatus />
+      <TodoItem todo={todo} />
+      // <TodoStatus />
     );
   },
   {
@@ -233,19 +217,17 @@ app.post(
   '/todos/toggle/:id',
   ({params}) => {
     console.log('index.tsx toggle: params =', params);
-    const todo = todos.find(todo => todo.id === params.id);
-    console.log('index.tsx toggle: todo =', todo);
+    const todo = getTodoQuery.get(params.id) as Todo;
     if (todo) {
-      // todo.completed = !todo.completed;
-      // return <TodoItem todo={todo} />;
       try {
-        const result = updateTodoPS.run(todo.completed ? 0 : 1, todo.id);
-        console.log('index.tsx post: result =', result);
+        todo.completed = 1 - todo.completed;
+        updateTodoPS.run(todo.completed, todo.id);
       } catch (e) {
         console.error('index.tsx toggle: e =', e);
         throw e;
       }
     }
+    return <TodoItem todo={todo} />;
   },
   {
     params: t.Object({
