@@ -49,7 +49,7 @@ The BETH stack uses:
 ## Database Setup
 
 - Create the database with `sqlite3 todos.db`
-- Create a table with `create table todos(id string primary key, description string, completed numeric);`
+- Create a table with `create table todos(id integer primary key autoincrement, description string, completed numeric);`
 - Verify that the table was created with `.schema`
 - Insert two rows with `insert into todos values('t1', 'cut grass', 0);`
   and `insert into todos values('t2', 'buy milk', 1);`

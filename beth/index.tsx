@@ -18,7 +18,7 @@ const insertTodoPS = db.prepare(
 const updateTodoPS = db.prepare('update todos set completed=? where id = ?');
 
 type Todo = {
-  id: string;
+  id: number;
   description: string;
   completed: number; // 0 or 1 for SQLite compatibility
 };
