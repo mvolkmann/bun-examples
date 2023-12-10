@@ -99,7 +99,6 @@ function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
       <button
         hx-delete={`/todos/${id}`}
         hx-swap="outerHTML"
-        class="flex gap-4"
         hx-target="closest div"
       >
         🗑
@@ -160,11 +159,7 @@ app.delete(
 app.get('/', () => (
   <BaseHtml>
     <div class="bg-gray-200 flex w-full h-screen justify-center items-center">
-      <button
-        class="bg-yellow-200 p-4 rounded-lg border border-black"
-        hx-post="/clicked"
-        hx-swap="outerHTML"
-      >
+      <button hx-post="/clicked" hx-swap="outerHTML">
         Click Me
       </button>
     </div>
@@ -179,7 +174,7 @@ app.get('/todos', () => {
 
   return (
     <BaseHtml>
-      <h2>To Do List</h2>
+      <h1>To Do List</h1>
       <TodoStatus />
       <TodoForm />
       <TodoList todos={todos} />
@@ -238,6 +233,19 @@ app.post(
 
 //-----------------------------------------------------------------------------
 
-app.listen(1919);
+const callback: ListenCallback = async ({hostname, port}) => {
+  console.log('index.tsx callback: hostname =', hostname);
+  console.log('index.tsx callback: port =', port);
+  /*
+  if (!globalThis.isOpened) {
+    globalThis.isOpened = true;
+    open(`http://${hostname}:${port}`); // https://www.npmjs.com/package/open
+  }
+
+  if (globalThis.ws) globalThis.ws.send('live-reload');
+  */
+};
+
+app.listen(1919, callback);
 
 console.log('listening on port', app.server?.port);

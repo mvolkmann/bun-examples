@@ -1,5 +1,17 @@
+button {
+  background-color: cornflowerblue;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+h1 {
+  color: gold;
+  /* TODO: Why is this not overridding Tailwind defaults? */
+  font-size: 2rem;
+  font-weight: bold;
+}
+
 input {
-  background-color: yellow;
   border: 1px solid red;
   border-radius: 0.5rem;
   padding: 0.5rem;
