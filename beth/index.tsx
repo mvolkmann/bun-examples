@@ -92,7 +92,7 @@ function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
       <input
         type="checkbox"
         checked={completed === 1}
-        hx-post={`/todos/${id}/toggle`}
+        hx-patch={`/todos/${id}/toggle`}
         hx-target="closest div" // can also use a CSS selector
         hx-swap="outerHTML"
       />
@@ -187,31 +187,8 @@ app.get('/todos', () => {
 
 //-----------------------------------------------------------------------------
 
-// This adds a new todo.  It is the C in CRUD.
-app.post(
-  '/todos',
-  ({body}: any) => {
-    const {description} = body;
-    if (description.length === 0) {
-      throw new Error('Todo description cannot be empty');
-    }
-    const todo = addTodo(description);
-    return (
-      <TodoItem todo={todo} />
-      // <TodoStatus />
-    );
-  },
-  {
-    body: t.Object({
-      description: t.String()
-    })
-  }
-);
-
-//-----------------------------------------------------------------------------
-
 // This toggles the completed state of a given todo.  It is the U in CRUD.
-app.post(
+app.patch(
   '/todos/:id/toggle',
   ({params}) => {
     const todo = getTodoQuery.get(params.id) as Todo;
@@ -231,6 +208,30 @@ app.post(
   {
     params: t.Object({
       id: t.Numeric() // converts string param to a number
+    })
+  }
+);
+
+//-----------------------------------------------------------------------------
+
+// This adds a new todo.  It is the C in CRUD.
+app.post(
+  '/todos',
+  ({body}: any) => {
+    const {description} = body;
+    if (description.length === 0) {
+      throw new Error('Todo description cannot be empty');
+    }
+    const todo = addTodo(description);
+    // TODO: Should this return a new TodoList that is sorted?
+    return (
+      <TodoItem todo={todo} />
+      // <TodoStatus />
+    );
+  },
+  {
+    body: t.Object({
+      description: t.String()
     })
   }
 );
