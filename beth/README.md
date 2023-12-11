@@ -23,7 +23,8 @@ The BETH stack uses:
 
   ```json
     "jsx": "react",
-    "jsxFactory": "elements.createElement",
+    "jsxFactory": "Html.createElement",
+    "jsxFragmentFactory": "Html.Fragment",
   ```
 
 - modify "index.ts" to contain the following:

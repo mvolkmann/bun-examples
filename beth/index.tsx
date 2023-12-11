@@ -57,6 +57,7 @@ const BaseHtml = ({children}: Attributes) => (
       <script src="public/htmx.min.js"></script>
       <script src="public/hyperscript.min.js"></script>
       <script src="public/tailwind.min.js"></script>
+      <script defer src="public/setup.js"></script>
     </head>
     <body class="p-8">{children}</body>
   </html>
@@ -67,9 +68,11 @@ const BaseHtml = ({children}: Attributes) => (
 function TodoForm() {
   return (
     <form
-      class="flex gap-4 my-4"
+      class="flex gap-4 items-center my-4"
       hx-post="/todos"
       hx-swap="afterend"
+      hx-indicator="#spinner"
+      hx-disabled-elt="#add-btn"
       _="on submit target.reset()" // uses hyperscript
     >
       <input
@@ -78,7 +81,15 @@ function TodoForm() {
         placeholder="enter new todo here"
         size="30"
       />
-      <button type="submit">Add</button>
+      <button id="add-btn" type="submit">
+        Add
+      </button>
+      <img
+        alt="loading..."
+        class="htmx-indicator h-6 w-6"
+        id="spinner"
+        src="/public/spinner.gif"
+      />
     </form>
   );
 }
@@ -98,6 +109,7 @@ function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
       />
       <p class={completed ? 'text-gray-500 line-through' : ''}>{description}</p>
       <button
+        hx-confirm="Are you sure?"
         hx-delete={`/todos/${id}`}
         hx-swap="outerHTML"
         hx-target="closest div"
@@ -223,6 +235,9 @@ app.post(
       throw new Error('Todo description cannot be empty');
     }
     const todo = addTodo(description);
+
+    Bun.sleepSync(2000); // enables testing hx-indicator spinner
+
     // TODO: Should this return a new TodoList that is sorted?
     return (
       <TodoItem todo={todo} />

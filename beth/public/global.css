@@ -1,7 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities
+
 button {
   background-color: cornflowerblue;
   border-radius: 0.5rem;
   padding: 0.5rem;
+}
+
+button:disabled {
+  opacity: 0.2;
 }
 
 h1 {
