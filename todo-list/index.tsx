@@ -2,8 +2,8 @@ import {Database} from 'bun:sqlite';
 import {Elysia, t} from 'elysia';
 import {html} from '@elysiajs/html';
 import {staticPlugin} from '@elysiajs/static';
-// import * as elements from 'typed-html';
 import {Attributes} from 'typed-html';
+import WebSocket from 'ws';
 
 const app = new Elysia();
 app.use(html());
@@ -43,7 +43,7 @@ const BaseHtml = ({children}: Attributes) => (
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>TODO List</title>
+      <title>To Do List</title>
       {/* TODO: Can the staticPlugin default to looking in /public? */}
       <link rel="stylesheet" href="/public/tailwind.css" />
       <script src="public/htmx.min.js"></script>
@@ -237,19 +237,10 @@ app.post(
 
 //-----------------------------------------------------------------------------
 
-const callback: ListenCallback = async ({hostname, port}) => {
-  console.log('index.tsx callback: hostname is', hostname);
-  console.log('index.tsx callback: port =', port);
-  /*
-  if (!globalThis.isOpened) {
-    globalThis.isOpened = true;
-    open(`http://${hostname}:${port}`); // https://www.npmjs.com/package/open
-  }
+// The browser code connects to this
+// so it can detect when the server is restarted.
+// On restart, the browser reloads the page.
+new WebSocket.Server({port: 1920});
 
-  if (globalThis.ws) globalThis.ws.send('live-reload');
-  */
-};
-
-app.listen(1919, callback);
-
+app.listen(1919);
 console.log('listening on port', app.server?.port);
