@@ -24,10 +24,6 @@ type Todo = {
   completed: number; // 0 or 1 for SQLite compatibility
 };
 
-// This is the state.
-let nextId = 0;
-const todos: Todo[] = [];
-
 function addTodo(description: string) {
   try {
     const {id} = insertTodoQuery.get(description) as {id: number};
@@ -47,15 +43,16 @@ const BaseHtml = ({children}: Attributes) => (
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>BETH stack demo</title>
+      <title>TODO List</title>
       {/* TODO: Can the staticPlugin default to looking in /public? */}
-      <link rel="stylesheet" href="/public/global.css" />
+      <link rel="stylesheet" href="/public/tailwind.css" />
       <script src="public/htmx.min.js"></script>
       <script src="public/hyperscript.min.js"></script>
-      <script src="public/tailwind.min.js"></script>
       <script defer src="public/setup.js"></script>
     </head>
-    <body class="p-8">{children}</body>
+    <body class="p-8" hx-sse="connect:/update">
+      {children}
+    </body>
   </html>
 );
 
@@ -95,7 +92,7 @@ function TodoForm() {
 type TodoItemProps = {todo: Todo};
 function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
   return (
-    <div class="flex gap-4">
+    <div class="flex gap-4 items-center mb-4">
       <input
         type="checkbox"
         checked={completed === 1}
@@ -103,8 +100,11 @@ function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
         hx-target="closest div" // can also use a CSS selector
         hx-swap="outerHTML"
       />
-      <p class={completed ? 'text-gray-500 line-through' : ''}>{description}</p>
+      <div class={completed ? 'text-gray-500 line-through' : ''}>
+        {description}
+      </div>
       <button
+        class="plain"
         hx-confirm="Are you sure?"
         hx-delete={`/todos/${id}`}
         hx-swap="outerHTML"
@@ -132,6 +132,7 @@ function TodoList({todos}: TodoListProps) {
 //-----------------------------------------------------------------------------
 
 function TodoStatus() {
+  const todos = getAllTodosQuery.all();
   const uncompletedCount = todos.filter(todo => !todo.completed).length;
   return (
     <p id="todo-status" hx-swap-oob="true">
@@ -163,19 +164,6 @@ app.delete(
     })
   }
 );
-
-//-----------------------------------------------------------------------------
-
-// This is a basic HTMX demo.
-app.get('/', () => (
-  <BaseHtml>
-    <div class="bg-gray-200 flex w-full h-screen justify-center items-center">
-      <button hx-post="/clicked" hx-swap="outerHTML">
-        Click Me
-      </button>
-    </div>
-  </BaseHtml>
-));
 
 //-----------------------------------------------------------------------------
 
@@ -250,7 +238,7 @@ app.post(
 //-----------------------------------------------------------------------------
 
 const callback: ListenCallback = async ({hostname, port}) => {
-  console.log('index.tsx callback: hostname =', hostname);
+  console.log('index.tsx callback: hostname is', hostname);
   console.log('index.tsx callback: port =', port);
   /*
   if (!globalThis.isOpened) {

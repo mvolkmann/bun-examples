@@ -44,6 +44,11 @@ The BETH stack uses:
 - enter "bun run --watch index.ts"
 - browse localhost:1919
 
+- If modifying styling using Tailwind classes,
+  enter `bunx tailwindcss -i ./global.css -o public/tailwind.css --watch`.
+  This will regenerate the file `public/tailwind.css` every time a file is saved
+  so that it contains only the Tailwind classes actually used.
+
 - rename "index.ts" to "index.tsx"
 - for VS Code users, install the "htmx-tags" extension
 
