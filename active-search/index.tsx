@@ -40,9 +40,10 @@ app.get('/', () => {
         <input
           autofocus="true"
           class="border border-gray-500 p-1 rounded-lg"
-          hx-post="/search"
           hx-trigger="keyup changed delay:200ms"
+          hx-post="/search"
           hx-target="#matches"
+          hx-swap="innerHTML"
           name="name"
           size="10"
         />
@@ -58,11 +59,11 @@ app.post('/search', ({body}) => {
   if (lowerName == '') return '';
   const matches = names.filter(n => n.toLowerCase().includes(lowerName));
   return (
-    <ul>
+    <>
       {matches.map(name => (
         <li>{name}</li>
       ))}
-    </ul>
+    </>
   );
 });
 
