@@ -132,7 +132,7 @@ function TodoList({todos}: TodoListProps) {
 //-----------------------------------------------------------------------------
 
 function TodoStatus() {
-  const todos = getAllTodosQuery.all();
+  const todos = getAllTodosQuery.all() as Todo[];
   const uncompletedCount = todos.filter(todo => !todo.completed).length;
   return (
     <p id="todo-status" hx-swap-oob="true">
@@ -196,7 +196,12 @@ app.patch(
         console.error('index.tsx toggle: e =', e);
         throw e;
       }
-      return <TodoItem todo={todo} />;
+      return (
+        <>
+          <TodoStatus />
+          <TodoItem todo={todo} />
+        </>
+      );
     } else {
       return new Response('Not found', {status: 404});
     }
@@ -220,12 +225,14 @@ app.post(
     }
     const todo = addTodo(description);
 
-    Bun.sleepSync(2000); // enables testing hx-indicator spinner
+    Bun.sleepSync(1000); // enables testing hx-indicator spinner
 
     // TODO: Should this return a new TodoList that is sorted?
     return (
-      <TodoItem todo={todo} />
-      // <TodoStatus />
+      <>
+        <TodoStatus />
+        <TodoItem todo={todo} />
+      </>
     );
   },
   {
