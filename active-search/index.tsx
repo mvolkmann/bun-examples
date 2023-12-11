@@ -30,21 +30,19 @@ const BaseHtml = ({children}: any) => (
 app.get('/', () => {
   return (
     <BaseHtml>
-      <form>
-        <label class="font-bold mr-4" for="name">
-          Name
-        </label>
-        <input
-          autofocus="true"
-          class="border border-gray-500 p-1 rounded-lg"
-          hx-post="/search"
-          hx-trigger="keyup changed delay:200ms"
-          hx-target="#matches"
-          name="name"
-          size="10"
-        />
-        <ul id="matches" />
-      </form>
+      <label class="font-bold mr-4" for="name">
+        Name
+      </label>
+      <input
+        autofocus="true"
+        class="border border-gray-500 p-1 rounded-lg"
+        hx-post="/search"
+        hx-trigger="keyup changed delay:200ms"
+        hx-target="#matches"
+        name="name"
+        size="10"
+      />
+      <ul id="matches" />
     </BaseHtml>
   );
 });
