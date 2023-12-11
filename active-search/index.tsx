@@ -23,7 +23,7 @@ const BaseHtml = ({children}: {children: any}) => (
   <html>
     <head>
       <title>HTMX Active Search</title>
-      <link href="/public/output.css" rel="stylesheet" />
+      <link href="/public/tailwind.css" rel="stylesheet" />
       <script src="https://unpkg.com/htmx.org@1.9.9"></script>
     </head>
     <body class="p-8">{children}</body>
