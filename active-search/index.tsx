@@ -1,8 +1,10 @@
 import {Elysia} from 'elysia';
 import {html} from '@elysiajs/html'; // enables use of JSX
+import {staticPlugin} from '@elysiajs/static'; // enables static file serving
 
 const app = new Elysia();
 app.use(html());
+app.use(staticPlugin());
 
 const names: string[] = [
   'Amanda',
@@ -16,12 +18,13 @@ const names: string[] = [
   'Tami'
 ];
 
-const BaseHtml = ({children}: any) => (
+// TODO: What type should be used for children?
+const BaseHtml = ({children}: {children: any}) => (
   <html>
     <head>
       <title>HTMX Active Search</title>
+      <link href="/public/output.css" rel="stylesheet" />
       <script src="https://unpkg.com/htmx.org@1.9.9"></script>
-      <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="p-8">{children}</body>
   </html>
