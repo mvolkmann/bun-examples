@@ -50,10 +50,6 @@ const BaseHtml = ({children}: Attributes) => (
       <title>BETH stack demo</title>
       {/* TODO: Can the staticPlugin default to looking in /public? */}
       <link rel="stylesheet" href="/public/global.css" />
-      {/* <script src="https://unpkg.com/htmx.org@1.9.9"></script>
-      <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
-      // Tailwind removes the default styling of many HTML elements.
-      <script src="https://cdn.tailwindcss.com"></script> */}
       <script src="public/htmx.min.js"></script>
       <script src="public/hyperscript.min.js"></script>
       <script src="public/tailwind.min.js"></script>
@@ -73,7 +69,7 @@ function TodoForm() {
       hx-swap="afterend"
       hx-indicator="#spinner"
       hx-disabled-elt="#add-btn"
-      _="on submit target.reset()" // uses hyperscript
+      _="on submit target.reset()" // uses _hyperscript
     >
       <input
         class="border border-gray-500 p-1 rounded-lg"
