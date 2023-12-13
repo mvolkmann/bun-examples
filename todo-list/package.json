@@ -3,7 +3,8 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch index.tsx"
+    "dev": "bun run --watch index.tsx",
+    "tw": "bunx tailwindcss -i ./global.css -o public/tailwind.css --watch"
   },
   "devDependencies": {
     "bun-types": "latest",

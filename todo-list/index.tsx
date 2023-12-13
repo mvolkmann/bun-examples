@@ -10,7 +10,7 @@ app.use(html());
 app.use(staticPlugin());
 
 const db = new Database('todos.db', {create: true});
-const deleteTodoPS = db.prepare('delete from todos where id = ?');
+const deleteTodoPS = db.query('delete from todos where id = ?');
 const getAllTodosQuery = db.query('select * from todos;');
 const getTodoQuery = db.query('select * from todos where id = ?');
 const insertTodoQuery = db.query(
@@ -37,7 +37,6 @@ function addTodo(description: string) {
 
 //-----------------------------------------------------------------------------
 
-// const BaseHtml = ({children}: elements.Children) => (
 const BaseHtml = ({children}: Attributes) => (
   <html lang="en">
     <head>
@@ -149,7 +148,9 @@ app.delete(
     try {
       // TODO: How can you determine if this found a todo to delete and
       // TODO: return this if it didn't? new Response('Not found', {status: 404});
-      deleteTodoPS.run(params.id);
+      // TODO: Why does this return undefined?
+      const result = deleteTodoPS.get(params.id);
+      console.log('index.tsx delete: result =', result);
     } catch (e) {
       console.error('index.tsx delete: e =', e);
       throw e;
