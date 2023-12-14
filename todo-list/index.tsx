@@ -35,8 +35,6 @@ function addTodo(description: string) {
   }
 }
 
-//-----------------------------------------------------------------------------
-
 const BaseHtml = ({children}: Attributes) => (
   <html lang="en">
     <head>
@@ -54,8 +52,6 @@ const BaseHtml = ({children}: Attributes) => (
     </body>
   </html>
 );
-
-//-----------------------------------------------------------------------------
 
 function TodoForm() {
   return (
@@ -86,8 +82,6 @@ function TodoForm() {
   );
 }
 
-//-----------------------------------------------------------------------------
-
 type TodoItemProps = {todo: Todo};
 function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
   return (
@@ -115,8 +109,6 @@ function TodoItem({todo: {id, description, completed}}: TodoItemProps) {
   );
 }
 
-//-----------------------------------------------------------------------------
-
 type TodoListProps = {todos: Todo[]};
 function TodoList({todos}: TodoListProps) {
   return (
@@ -128,8 +120,6 @@ function TodoList({todos}: TodoListProps) {
   );
 }
 
-//-----------------------------------------------------------------------------
-
 function TodoStatus() {
   const todos = getAllTodosQuery.all() as Todo[];
   const uncompletedCount = todos.filter(todo => !todo.completed).length;
@@ -139,7 +129,6 @@ function TodoStatus() {
     </p>
   );
 }
-//-----------------------------------------------------------------------------
 
 // This deletes a given todo.  It is the D in CRUD.
 app.delete(
@@ -166,8 +155,6 @@ app.delete(
   }
 );
 
-//-----------------------------------------------------------------------------
-
 // This renders the todo list UI.  It is the R in CRUD.
 app.get('/todos', () => {
   const todos = getAllTodosQuery.all();
@@ -181,8 +168,6 @@ app.get('/todos', () => {
     </BaseHtml>
   );
 });
-
-//-----------------------------------------------------------------------------
 
 // This toggles the completed state of a given todo.  It is the U in CRUD.
 app.patch(
@@ -214,13 +199,11 @@ app.patch(
   }
 );
 
-//-----------------------------------------------------------------------------
-
 // This adds a new todo.  It is the C in CRUD.
 app.post(
   '/todos',
   ({body}: any) => {
-    const {description} = body;
+    const description = body.description.trim();
     if (description.length === 0) {
       throw new Error('Todo description cannot be empty');
     }
@@ -242,8 +225,6 @@ app.post(
     })
   }
 );
-
-//-----------------------------------------------------------------------------
 
 // The browser code connects to this
 // so it can detect when the server is restarted.
