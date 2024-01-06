@@ -4,7 +4,8 @@ import {staticPlugin} from '@elysiajs/static'; // enables static file serving
 
 const app = new Elysia();
 app.use(html());
-app.use(staticPlugin());
+// This causes link and script tags to look for files in the public directory.
+app.use(staticPlugin({prefix: ''}));
 
 const names: string[] = [
   'Amanda',
@@ -19,11 +20,15 @@ const names: string[] = [
 ];
 
 // TODO: What type should be used for children?
+// See https://github.com/elysiajs/elysia-html/issues/72.
+// Consider using https://www.npmjs.com/package/@kitajs/html.
+// import type {Html} from '@kitajs/html';
+// Use the type Html.Children.
 const BaseHtml = ({children}: {children: any}) => (
   <html>
     <head>
       <title>HTMX Active Search</title>
-      <link href="/public/tailwind.css" rel="stylesheet" />
+      <link href="/tailwind.css" rel="stylesheet" />
       <script src="https://unpkg.com/htmx.org@1.9.9"></script>
     </head>
     <body class="p-8">{children}</body>
