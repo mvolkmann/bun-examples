@@ -49,6 +49,7 @@ test('sqlite', async () => {
     .where(eq(todosTable.id, id));
 
   // Verify that the update worked.
+  // TODO: Is there a better way to get just the first matching record?
   todos = await db.select().from(todosTable).where(eq(todosTable.id, id)).all();
   [firstTodo] = todos;
   expect(firstTodo.completed).toBe(true);
@@ -59,4 +60,6 @@ test('sqlite', async () => {
   // Verify that the table is now empty.
   todos = db.select().from(todosTable).all();
   expect(todos.length).toBe(0);
+
+  // TODO: Try implementing a join.
 });
