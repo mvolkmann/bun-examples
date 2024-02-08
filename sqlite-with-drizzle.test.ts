@@ -35,25 +35,28 @@ test('sqlite', async () => {
   const id = results[0].id;
   expect(id).toBeGreaterThan(0);
 
-  // Get all the todos.
+  // Get all the todo records.
   let todos = db.select().from(todosTable).all();
   expect(todos.length).toBe(1);
   let [firstTodo] = todos;
   expect(firstTodo.description).toBe(description);
   expect(firstTodo.completed).toBe(false);
 
-  // Update the completed status of a todo.
+  // Update the completed status of the todo.
   await db
     .update(todosTable)
     .set({completed: true})
     .where(eq(todosTable.id, id));
 
+  // Verify that the update worked.
   todos = await db.select().from(todosTable).where(eq(todosTable.id, id)).all();
   [firstTodo] = todos;
   expect(firstTodo.completed).toBe(true);
 
+  // Delete the new record.
   await db.delete(todosTable).where(eq(todosTable.id, id));
 
+  // Verify that the table is now empty.
   todos = db.select().from(todosTable).all();
   expect(todos.length).toBe(0);
 });
