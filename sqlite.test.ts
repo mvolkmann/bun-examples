@@ -1,3 +1,4 @@
+// To run this, enter `bun test sqlite.test.ts`.
 import {Database} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
 
