@@ -2,7 +2,7 @@
 // To install Drizzle, enter `bun add drizzle-orm` and `bun add -D drizzle-kit`.
 import {Database} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
-import {eq, sql} from 'drizzle-orm';
+import {eq} from 'drizzle-orm';
 import {drizzle} from 'drizzle-orm/bun-sqlite';
 import {integer, sqliteTable, text} from 'drizzle-orm/sqlite-core';
 
@@ -49,8 +49,14 @@ test('sqlite', async () => {
     .where(eq(todosTable.id, id));
 
   // Verify that the update worked.
+  // The select method returns all columns when no columns are specified.
   // TODO: Is there a better way to get just the first matching record?
-  todos = await db.select().from(todosTable).where(eq(todosTable.id, id)).all();
+  todos = await db
+    .select()
+    // .select({completed: todosTable.completed})
+    .from(todosTable)
+    .where(eq(todosTable.id, id))
+    .all();
   [firstTodo] = todos;
   expect(firstTodo.completed).toBe(true);
 
