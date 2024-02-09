@@ -1,11 +1,13 @@
 {
   "name": "drizzle-demo",
-  "module": "index.ts",
   "type": "module",
   "scripts": {
-    "introspect": "drizzle-kit introspect:sqlite",
+    "clean": "rm -rf todo.db migrations",
     "migrate:gen": "drizzle-kit generate:sqlite --config drizzle.config.ts",
     "migrate:push": "drizzle-kit push:sqlite",
+    "migrate:pull": "drizzle-kit introspect:sqlite",
+    "migrate:drop": "drizzle-kit drop --config drizzle.config.ts",
+    "studio": "drizzle-kit studio",
     "test": "bun test"
   },
   "devDependencies": {
