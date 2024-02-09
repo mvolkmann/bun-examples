@@ -3,7 +3,8 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "migrate": "bun drizzle-kit generate:sqlite --config drizzle.config.ts",
+    "migrate:gen": "bun drizzle-kit generate:sqlite --config drizzle.config.ts",
+    "migrate:push": "bun drizzle-kit push:sqlite",
     "test": "bun test",
     "build": "drizzle-kit build"
   },

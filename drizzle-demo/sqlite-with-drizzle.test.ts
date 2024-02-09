@@ -1,15 +1,11 @@
-// To create the database for this, enter the following terminal commands:
-// - sqlite3 todo.db
-// - create table person(id integer primary key autoincrement, name string);
-// - create table todo(id integer primary key autoincrement, description string, completed integer, personId integer);
-// - .exit
-// To run this, enter `bun test sqlite-with-drizzle.test.ts`.
-// To install Drizzle, enter `bun add drizzle-orm` and `bun add -D drizzle-kit`.
+// To create the database for this, enter:
+// - bun migrate:gen
+// - bun migrate:push (and select "Yes")
+// To run this, enter `bun test`.
 import {Database} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
 import {eq} from 'drizzle-orm';
-// import {drizzle} from 'drizzle-orm/bun-sqlite';
-import {drizzle} from 'drizzle-orm/better-sqlite3';
+import {drizzle} from 'drizzle-orm/bun-sqlite';
 import {
   personTable,
   Person,
