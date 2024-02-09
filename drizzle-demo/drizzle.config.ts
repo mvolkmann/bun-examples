@@ -5,6 +5,6 @@ export default {
   out: './drizzle',
   driver: 'sqlite',
   dbCredentials: {
-    url: './sqlite.db'
+    url: './todo.db'
   }
 } satisfies Config;

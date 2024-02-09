@@ -9,26 +9,13 @@ import {Database} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
 import {eq} from 'drizzle-orm';
 import {drizzle} from 'drizzle-orm/bun-sqlite';
-import {integer, sqliteTable, text} from 'drizzle-orm/sqlite-core';
+import {personTable, todoTable} from './db/schema';
 
 type Todo = {
   id: number;
   description: string;
   completed: number; // 0 or 1 for SQLite compatibility
 };
-
-const personTable = sqliteTable('person', {
-  id: integer('id').primaryKey({autoIncrement: true}),
-  name: text('name').notNull()
-});
-
-const todoTable = sqliteTable('todo', {
-  // The strings passed to the functions below are the column names.
-  id: integer('id').primaryKey({autoIncrement: true}),
-  description: text('description').notNull(),
-  completed: integer('completed', {mode: 'boolean'}).default(false),
-  personId: integer('personId').references(personTable.id)
-});
 
 const bunDB = new Database('todo.db', {create: true});
 const db = drizzle(bunDB);
