@@ -9,13 +9,14 @@ import {Database} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
 import {eq} from 'drizzle-orm';
 import {drizzle} from 'drizzle-orm/bun-sqlite';
-import {personTable, todoTable} from './db/schema';
-
-type Todo = {
-  id: number;
-  description: string;
-  completed: number; // 0 or 1 for SQLite compatibility
-};
+import {
+  personTable,
+  Person,
+  InsertPerson,
+  todoTable,
+  Todo,
+  InsertTodo
+} from './db/schema';
 
 const bunDB = new Database('todo.db', {create: true});
 const db = drizzle(bunDB);
