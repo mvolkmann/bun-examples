@@ -3,7 +3,6 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "build": "drizzle-kit build",
     "introspect": "drizzle-kit introspect:sqlite",
     "migrate:gen": "drizzle-kit generate:sqlite --config drizzle.config.ts",
     "migrate:push": "drizzle-kit push:sqlite",
