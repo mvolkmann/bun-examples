@@ -6,14 +6,7 @@ import {Database} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
 import {eq} from 'drizzle-orm';
 import {drizzle} from 'drizzle-orm/bun-sqlite';
-import {
-  personTable,
-  Person,
-  InsertPerson,
-  todoTable,
-  Todo,
-  InsertTodo
-} from './db/schema';
+import {personTable, todoTable} from './db/schema';
 
 const bunDB = new Database('todo.db', {create: true});
 const db = drizzle(bunDB);
