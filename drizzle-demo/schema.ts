@@ -38,16 +38,21 @@ export const todoTable = sqliteTable(
   })
 );
 
-export const personRelations = relations(personTable, ({many}) => ({
-  todos: many(todoTable)
-}));
-
-export const todoRelations = relations(todoTable, ({one}) => ({
-  persons: one(personTable)
-}));
-
 export type Person = InferSelectModel<typeof personTable>;
 export type InsertPerson = InferInsertModel<typeof personTable>;
 
 export type Todo = InferSelectModel<typeof todoTable>;
 export type InsertTodo = InferInsertModel<typeof todoTable>;
+
+// Relationships must be specified in both directions
+// in order to use Drizzle Studio.  If not, the error
+// "There is not enough information to infer relation" will be thrown.
+export const personRelations = relations(personTable, ({many}) => ({
+  todos: many(todoTable)
+}));
+export const todoRelations = relations(todoTable, ({one}) => ({
+  person: one(personTable, {
+    fields: [todoTable.personId],
+    references: [personTable.id]
+  })
+}));
