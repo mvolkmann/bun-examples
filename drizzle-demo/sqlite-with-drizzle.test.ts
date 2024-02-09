@@ -8,7 +8,8 @@
 import {Database} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
 import {eq} from 'drizzle-orm';
-import {drizzle} from 'drizzle-orm/bun-sqlite';
+// import {drizzle} from 'drizzle-orm/bun-sqlite';
+import {drizzle} from 'drizzle-orm/better-sqlite3';
 import {
   personTable,
   Person,
