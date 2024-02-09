@@ -76,19 +76,15 @@ test('sqlite', async () => {
     .where(eq(personTable.name, 'Tami'))
     .innerJoin(todoTable, eq(personTable.id, todoTable.personId));
   expect(todos.length).toBe(2);
-  expect(todos[0].todo.description).toBe('buy milk');
-  expect(todos[1].todo.description).toBe('ride bike');
+  const [todo1, todo2] = todos;
+  expect(todo1.person.name).toBe('Tami');
+  expect(todo1.todo.description).toBe('buy milk');
+  expect(todo1.todo.completed).toBe(false);
+  expect(todo2.todo.description).toBe('ride bike');
 
-  /*
-  let [firstTodo] = todos;
-  expect(firstTodo.description).toBe(description);
-  expect(firstTodo.completed).toBe(false);
-
-  // Update the completed status of the todo.
-  await db
-    .update(todoTable)
-    .set({completed: true})
-    .where(eq(todoTable.id, id));
+  // Update the completed status of the first todo.
+  const {id} = todo1.todo;
+  await db.update(todoTable).set({completed: true}).where(eq(todoTable.id, id));
 
   // Verify that the update worked.
   // The select method returns all columns when no columns are specified.
@@ -99,16 +95,13 @@ test('sqlite', async () => {
     .from(todoTable)
     .where(eq(todoTable.id, id))
     .all();
-  [firstTodo] = todos;
-  expect(firstTodo.completed).toBe(true);
+  expect(todos[0].completed).toBe(true);
 
   // Delete the new record.
   await db.delete(todoTable).where(eq(todoTable.id, id));
 
-  // Verify that the table is now empty.
-  todos = db.select().from(todoTable).all();
-  expect(todos.length).toBe(0);
-  */
-
-  // TODO: Try implementing a join.
+  // Verify that the delete worked.
+  // todos = db.select().from(todoTable).where(eq(todoTable.id, id)).all();
+  const result = await db.select().from(todoTable).where(eq(todoTable.id, id));
+  expect(result.length).toBe(0);
 });
