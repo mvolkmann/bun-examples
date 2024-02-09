@@ -18,6 +18,12 @@ import {
 const bunDB = new Database('todo.db', {create: true});
 const db = drizzle(bunDB);
 
+/**
+ * This creates a row in the person table
+ * and returns the id of the new row.
+ * @param name {string}
+ * @returns {number} id of new row
+ */
 async function createPerson(name: string): Promise<number> {
   const results = await db
     .insert(personTable)
@@ -26,6 +32,13 @@ async function createPerson(name: string): Promise<number> {
   return results[0].id;
 }
 
+/**
+ * This creates a row in the todo table
+ * and returns the id of the new row.
+ * @param description {string}
+ * @param personId {number} id of a person record
+ * @returns {number} id of new row
+ */
 async function createTodo(
   description: string,
   personId: number
@@ -42,51 +55,49 @@ test('sqlite', async () => {
   await db.delete(todoTable);
   await db.delete(personTable);
 
+  // Create new records.
   const markId = await createPerson('Mark');
   const tamiId = await createPerson('Tami');
-
   await createTodo('buy milk', tamiId);
   await createTodo('ride bike', tamiId);
   await createTodo('cut grass', markId);
   await createTodo('walk dog', markId);
 
   // Get all the todo records.
+  // The select method returns all columns when no columns are specified.
   let todos = db.select().from(todoTable).all();
   expect(todos.length).toBe(4);
 
   // Get all the todo records for Tami.
-  todos = await db
+  const joins = await db
     .select()
     .from(personTable)
     .where(eq(personTable.name, 'Tami'))
     .innerJoin(todoTable, eq(personTable.id, todoTable.personId));
-  expect(todos.length).toBe(2);
-  const [todo1, todo2] = todos;
-  expect(todo1.person.name).toBe('Tami');
-  expect(todo1.todo.description).toBe('buy milk');
-  expect(todo1.todo.completed).toBe(false);
-  expect(todo2.todo.description).toBe('ride bike');
+  expect(joins.length).toBe(2);
+  const [join1, join2] = joins;
+  expect(join1.person.name).toBe('Tami');
+  expect(join1.todo.description).toBe('buy milk');
+  expect(join1.todo.completed).toBe(false);
+  expect(join2.todo.description).toBe('ride bike');
 
   // Update the completed status of the first todo.
-  const {id} = todo1.todo;
+  const {id} = join1.todo;
   await db.update(todoTable).set({completed: true}).where(eq(todoTable.id, id));
 
   // Verify that the update worked.
-  // The select method returns all columns when no columns are specified.
   // TODO: Is there a better way to get just the first matching record?
-  todos = await db
-    .select()
-    // .select({completed: todoTable.completed})
+  const completedValues = await db
+    .select({completed: todoTable.completed})
     .from(todoTable)
     .where(eq(todoTable.id, id))
     .all();
-  expect(todos[0].completed).toBe(true);
+  expect(completedValues[0].completed).toBe(true);
 
   // Delete the new record.
   await db.delete(todoTable).where(eq(todoTable.id, id));
 
   // Verify that the delete worked.
-  // todos = db.select().from(todoTable).where(eq(todoTable.id, id)).all();
-  const result = await db.select().from(todoTable).where(eq(todoTable.id, id));
-  expect(result.length).toBe(0);
+  const results = await db.select().from(todoTable).where(eq(todoTable.id, id));
+  expect(results.length).toBe(0);
 });
