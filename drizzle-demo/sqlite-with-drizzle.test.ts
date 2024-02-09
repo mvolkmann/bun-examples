@@ -2,7 +2,7 @@
 // - bun migrate:gen
 // - bun migrate:push (and select "Yes")
 // To run this, enter `bun test`.
-import {Database} from 'bun:sqlite';
+import {Database, SQLiteError} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
 import {eq} from 'drizzle-orm';
 import {drizzle} from 'drizzle-orm/bun-sqlite';
@@ -55,6 +55,12 @@ test('sqlite', async () => {
   await createTodo('ride bike', tamiId);
   await createTodo('cut grass', markId);
   await createTodo('walk dog', markId);
+
+  // Attempt to add a duplicate todo that violates
+  // the unique constraint specified in db/schema.ts.
+  // This throws
+  // "SQLiteError: UNIQUE constraint failed: todo.description".
+  expect(() => createTodo('walk dog', tamiId)).toThrow(SQLiteError);
 
   // Get all the todo records.
   // The select method returns all columns when no columns are specified.
