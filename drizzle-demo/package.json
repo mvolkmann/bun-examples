@@ -7,7 +7,7 @@
     "migrate:push": "drizzle-kit push:sqlite",
     "migrate:pull": "drizzle-kit introspect:sqlite",
     "migrate:drop": "drizzle-kit drop --config drizzle.config.ts",
-    "studio": "drizzle-kit studio",
+    "studio": "drizzle-kit studio --config drizzle.config.ts",
     "test": "bun test"
   },
   "devDependencies": {
