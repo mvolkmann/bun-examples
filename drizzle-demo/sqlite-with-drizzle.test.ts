@@ -4,7 +4,7 @@
 // To run this, enter `bun test`.
 import {Database, SQLiteError} from 'bun:sqlite';
 import {expect, test} from 'bun:test';
-import {eq} from 'drizzle-orm';
+import {eq, sql} from 'drizzle-orm';
 import {drizzle} from 'drizzle-orm/bun-sqlite';
 import {personTable, todoTable} from './schema';
 
@@ -97,6 +97,14 @@ test('sqlite', async () => {
   await db.delete(todoTable).where(eq(todoTable.id, id));
 
   // Verify that the delete worked.
-  const results = await db.select().from(todoTable).where(eq(todoTable.id, id));
+  // This does not use a prepared statement.
+  // const results = await db.select().from(todoTable).where(eq(todoTable.id, id));
+  // This does use a prepared statement.
+  const getTodoById = db
+    .select()
+    .from(todoTable)
+    .where(eq(todoTable.id, sql.placeholder('id')))
+    .prepare();
+  const results = await getTodoById.execute({id});
   expect(results.length).toBe(0);
 });
