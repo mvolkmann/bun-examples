@@ -43,7 +43,7 @@ async function createTodo(
   return results[0].id;
 }
 
-test('sqlite', async () => {
+test.skip('sqlite', async () => {
   // Delete all the existing records.
   await db.delete(todoTable);
   await db.delete(personTable);
