@@ -1,11 +1,19 @@
 {
   "name": "bundle-demo",
   "module": "index.ts",
+  "scripts": {
+    "bundle": "bun build src/index.ts --minify --outdir build",
+    "clean": "rm -rf build",
+    "start": "bun run build/index.js"
+  },
   "devDependencies": {
     "bun-types": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "date-fns": "^3.3.1"
+  }
 }
