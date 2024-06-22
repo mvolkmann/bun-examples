@@ -9,14 +9,14 @@ type Todo = {
 };
 
 const db = new Database('todos.db');
-const deleteAllTodosPS = db.prepare('delete from todos');
-const deleteTodoPS = db.prepare('delete from todos where id = ?');
-const getTodoQuery = db.query('select * from todos where id = ?');
 const getAllTodosQuery = db.query('select * from todos;');
+const getTodoQuery = db.query('select * from todos where id = ?');
 const insertTodoQuery = db.query(
   'insert into todos (text, completed) values (?, 0) returning id'
 );
 const updateTodoPS = db.prepare('update todos set completed=? where id = ?');
+const deleteAllTodosPS = db.prepare('delete from todos');
+const deleteTodoPS = db.prepare('delete from todos where id = ?');
 
 test('sqlite', () => {
   deleteAllTodosPS.run();
