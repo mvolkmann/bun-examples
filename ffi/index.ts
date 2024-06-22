@@ -3,6 +3,7 @@ import {dlopen, FFIType, ptr, suffix} from 'bun:ffi';
 
 // Open a dynamic library.
 const path = `libaverage.${suffix}`;
+console.log('index.ts: path =', path);
 const lib = dlopen(path, {
   average: {
     args: [FFIType.ptr, FFIType.i32],

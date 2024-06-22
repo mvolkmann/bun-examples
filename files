@@ -1,0 +1,49 @@
+#!/usr/bin/env bun
+import {$} from 'bun';
+import {parseArgs} from 'util';
+
+const {values, positionals} = parseArgs({
+  args: Bun.argv,
+  options: {
+    help: {
+      type: 'boolean'
+    },
+    limit: {
+      type: 'string'
+    },
+    verbose: {
+      type: 'boolean'
+    }
+  },
+  allowPositionals: true
+});
+
+const {help, verbose} = values;
+if (help) {
+  console.log(`
+Usage: files [options] <extension>
+Options:
+  --help: Show help
+  --limit: Limit number of files to display
+  --verbose: Show the full file name
+`);
+  process.exit(0);
+}
+
+// Will be NaN if missing or invalid.
+const limit = Number(values.limit);
+const extension = positionals.at(-1);
+
+let count = 0;
+const lines = $`ls *.${extension}`.lines();
+for await (const line of lines) {
+  if (verbose) {
+    console.log(line);
+  } else {
+    // Remove file extension.
+    const index = line.lastIndexOf('.');
+    console.log(line.substring(0, index));
+  }
+  count++;
+  if (count === limit) break;
+}
