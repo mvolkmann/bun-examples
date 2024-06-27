@@ -18,5 +18,5 @@ test('import.meta', async () => {
   // This finds the path of a file relative to the current file.
   const importName = 'dogs.json';
   const resolved = await import.meta.resolve('./' + importName);
-  expect(resolved).toBe(`${dir}/${importName}`);
+  expect(resolved).toBe(`file://${dir}/${importName}`);
 });
